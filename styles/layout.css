@@ -1,0 +1,35 @@
+/* App shell and layout helpers */
+.app { min-height: 100vh; background: var(--bg); color: var(--text); }
+.container { max-width: 1024px; margin: 0 auto; padding: 1rem; }
+
+/* Header */
+.header { background: rgba(255,255,255,.8); border-bottom: 1px solid var(--border); backdrop-filter: saturate(1.2) blur(6px); position: sticky; top: 0; z-index: 20; }
+.header-inner { max-width: 1024px; margin: 0 auto; padding: .9rem 1rem; display: flex; align-items: center; justify-content: space-between; }
+.title { font-size: 1.125rem; font-weight: 600; margin: 0; }
+.brand { display: flex; align-items: center; gap: .5rem; }
+.brand-logo { width: 24px; height: 24px; border-radius: 6px; box-shadow: var(--shadow); }
+.nav { display: flex; gap: .4rem; }
+.nav-link { color: #374151; text-decoration: none; padding: .45rem .75rem; border-radius: 999px; border: 1px solid transparent; transition: background .15s ease, color .15s ease, border-color .15s ease; }
+.nav-link:hover { background: #e0f2fe; color: #0c4a6e; border-color: #bae6fd; }
+.nav-link--active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 10px rgba(5, 150, 105, .25); }
+
+/* Optional colored underline accent */
+.header::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: linear-gradient(90deg, #10b981, #34d399, #60a5fa); opacity: .6; }
+
+/* Spacing & grids */
+.stack > * + * { margin-top: 1.5rem; }
+.grid { display: grid; gap: 1rem; }
+.grid--stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 768px) { .grid--stats { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.grid--cards { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+@media (min-width: 640px) { .grid--cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .grid--cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.grid--two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid--2col { grid-template-columns: 1fr; }
+@media (min-width: 768px) { .grid--2col { grid-template-columns: 1fr 1fr; } }
+.row-between { display: flex; align-items: center; justify-content: space-between; }
+.actions { display: flex; gap: .5rem; margin-top: 1rem; }
+
+/* Links */
+.link { color: #065f46; text-decoration: none; font-size: .875rem; }
+.link:hover { text-decoration: underline; }

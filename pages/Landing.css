@@ -1,0 +1,54 @@
+/* Landing Navbar Styles */
+
+.landing-navbar {
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: saturate(1.2) blur(6px);
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  padding: 1rem 0;
+}
+
+.landing-navbar-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-segment {
+  display: inline-flex;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 999px;
+  padding: 2px;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.1);
+}
+
+.landing-nav-link {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.landing-nav-link:hover {
+  background: rgba(34, 197, 94, 0.1);
+  color: var(--primary);
+}
+
+.landing-nav-link.active {
+  color: #fff;
+  background: var(--primary);
+  box-shadow: 0 4px 10px rgba(34, 197, 94, 0.2);
+}
+
