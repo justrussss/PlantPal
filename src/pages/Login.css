@@ -122,3 +122,87 @@
   color: #fff;
   box-shadow: 0 4px 10px rgba(34, 197, 94, 0.2);
 }
+/* Mobile Responsive */
+@media (max-width: 640px) {
+  .hero {
+    min-height: 100vh;
+  }
+
+  .hero-inner {
+    gap: 1.5rem;
+    padding: 1.5rem 0.5rem;
+    grid-template-columns: 1fr;
+  }
+
+  .hero-form-wrapper {
+    min-height: auto;
+    padding-left: 0;
+    margin-top: 2rem;
+  }
+
+  .card--form {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .btn--full {
+    min-width: 100%;
+  }
+
+  .hero-title {
+    font-size: 1.5rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .hero-img {
+    max-width: 120px !important;
+  }
+
+  .form {
+    gap: 0.8rem;
+    padding: 1rem;
+  }
+
+  .form label {
+    font-size: 0.8rem;
+  }
+
+  .input,
+  .textarea {
+    padding: 0.6rem 0.7rem;
+    font-size: 16px; /* Prevents iOS zoom on input */
+  }
+
+  .btn {
+    padding: 0.6rem 0.9rem;
+    font-size: 0.9rem;
+  }
+
+  .segmented {
+    padding: 1px;
+  }
+
+  .segmented-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .hero-inner {
+    gap: 2rem;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .hero-form-wrapper {
+    min-height: 50vh;
+    padding-left: 1rem;
+  }
+
+  .btn--full {
+    min-width: 100%;
+  }
+}

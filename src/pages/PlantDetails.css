@@ -122,3 +122,54 @@
   background: var(--amber-600);
   color: #fff;
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .card {
+    padding: 0.875rem;
+  }
+
+  .actions {
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 0.45rem 0.8rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .card {
+    padding: 0.75rem;
+  }
+
+  .card h3 {
+    font-size: 0.95rem;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 0.6rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 0.65rem;
+  }
+
+  .empty {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .btn {
+    padding: 0.55rem 0.85rem;
+    font-size: 0.85rem;
+  }
+}

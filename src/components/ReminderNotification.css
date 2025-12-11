@@ -11,3 +11,22 @@
   padding: 0.6rem 0.8rem;
   box-shadow: var(--shadow);
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+  .toast {
+    right: 0.75rem;
+    bottom: 0.75rem;
+    padding: 0.55rem 0.7rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .toast {
+    right: 0.5rem;
+    bottom: 0.5rem;
+    padding: 0.5rem 0.6rem;
+    font-size: 0.85rem;
+  }
+}
