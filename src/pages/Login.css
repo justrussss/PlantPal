@@ -1,0 +1,124 @@
+/* Login Page Styles */
+
+/* Hero Section */
+.hero {
+  min-height: calc(100vh - 64px);
+  overflow: hidden;
+}
+
+.hero-inner {
+  gap: 3rem;
+  padding: 4rem 1rem;
+}
+
+.hero-art {
+  margin-top: 0.5rem;
+}
+
+/* Form Wrapper */
+.hero-form-wrapper {
+  display: grid;
+  place-items: center;
+  min-height: 60vh;
+  padding-left: 2rem;
+}
+
+.card--form {
+  max-width: 620px;
+}
+
+/* Auth Toggle */
+.auth-toggle-wrapper {
+  display: grid;
+  place-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.auth-subtitle {
+  margin-top: 0;
+}
+
+/* Form Actions */
+.form-actions--centered {
+  justify-content: center;
+  align-items: center;
+}
+
+.btn--full {
+  min-width: 400px;
+}
+
+/* Form Styles */
+.form {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.form--2col {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .form--2col {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.form label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.input,
+.textarea {
+  margin-top: 0.35rem;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  font: inherit;
+  background: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+.form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Segmented Control */
+.segmented {
+  display: inline-flex;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 999px;
+  padding: 2px;
+  box-shadow: var(--shadow);
+}
+
+.segmented-btn {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  padding: 0.45rem 1rem;
+  cursor: pointer;
+  border-radius: 999px;
+  font: inherit;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.segmented-btn.active {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(34, 197, 94, 0.2);
+}
