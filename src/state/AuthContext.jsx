@@ -1,7 +1,11 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 
 const AuthContext = createContext(null)
-const API_URL = 'http://localhost:5000/api'
+
+// Use current domain for API, or localhost:5000 for development
+const API_URL = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+  ? 'http://localhost:5000/api'
+  : `${window.location.origin}/api`
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
@@ -29,7 +33,7 @@ export function AuthProvider({ children }) {
         sessionStorage.setItem('plantpal_user', JSON.stringify(userData))
         return userData
       } else {
-        throw new Error(data.error)
+        throw new Error(data.error || 'Invalid email or password. Try signing up if you\'re new.')
       }
     } catch (err) {
       throw err

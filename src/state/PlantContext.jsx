@@ -4,7 +4,11 @@ import { computeNextSchedule } from '../utils/schedule.js'
 import { useAuth } from './AuthContext'
 
 const PlantContext = createContext()
-const API_URL = 'http://localhost:5000/api'
+
+// Use current domain for API, or localhost:5000 for development
+const API_URL = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+  ? 'http://localhost:5000/api'
+  : `${window.location.origin}/api`
 
 const initialState = {
   plants: [],
