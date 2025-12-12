@@ -1,6 +1,7 @@
 import { createContext, useContext, useReducer, useEffect } from 'react'
 import { addDays, isBefore } from 'date-fns'
 import { computeNextSchedule } from '../utils/schedule.js'
+import { useAuth } from './AuthContext'
 
 const PlantContext = createContext()
 
@@ -8,9 +9,11 @@ const initialState = {
   plants: [],
 }
 
-function loadState() {
+function loadState(userEmail) {
   try {
-    const raw = localStorage.getItem('plantpal.state')
+    if (!userEmail) return initialState
+    const key = `plantpal.plants.${userEmail}`
+    const raw = localStorage.getItem(key)
     if (!raw) return initialState
     const parsed = JSON.parse(raw)
     return parsed
@@ -19,9 +22,11 @@ function loadState() {
   }
 }
 
-function saveState(state) {
+function saveState(state, userEmail) {
   try {
-    localStorage.setItem('plantpal.state', JSON.stringify(state))
+    if (!userEmail) return
+    const key = `plantpal.plants.${userEmail}`
+    localStorage.setItem(key, JSON.stringify(state))
   } catch {}
 }
 
@@ -55,17 +60,27 @@ function reducer(state, action) {
       const { id } = action.payload
       return { ...state, plants: state.plants.filter((p) => p.id !== id) }
     }
+    case 'RESET': {
+      return initialState
+    }
     default:
       return state
   }
 }
 
 export function PlantProvider({ children }) {
-  const [state, dispatch] = useReducer(reducer, undefined, loadState)
+  const { user } = useAuth()
+  const [state, dispatch] = useReducer(reducer, undefined, () => loadState(user?.email))
 
   useEffect(() => {
-    saveState(state)
-  }, [state])
+    saveState(state, user?.email)
+  }, [state, user?.email])
+
+  useEffect(() => {
+    if (!user) {
+      dispatch({ type: 'RESET' })
+    }
+  }, [user])
 
   const overdueCount = state.plants.filter((p) => {
     const now = new Date()
