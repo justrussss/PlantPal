@@ -60,8 +60,8 @@ function reducer(state, action) {
       const { id } = action.payload
       return { ...state, plants: state.plants.filter((p) => p.id !== id) }
     }
-    case 'RESET': {
-      return initialState
+    case 'LOAD_USER_PLANTS': {
+      return action.payload
     }
     default:
       return state
@@ -77,10 +77,9 @@ export function PlantProvider({ children }) {
   }, [state, user?.email])
 
   useEffect(() => {
-    if (!user) {
-      dispatch({ type: 'RESET' })
-    }
-  }, [user])
+    const newState = loadState(user?.email)
+    dispatch({ type: 'LOAD_USER_PLANTS', payload: newState })
+  }, [user?.email])
 
   const overdueCount = state.plants.filter((p) => {
     const now = new Date()
