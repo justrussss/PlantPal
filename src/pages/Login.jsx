@@ -15,7 +15,7 @@ export default function Login() {
   const [activeNav, setActiveNav] = useState('features')
   const navigate = useNavigate()
   const location = useLocation()
-  const { login, isAuthenticated } = useAuth()
+  const { login, signup, isAuthenticated } = useAuth()
 
   const from = location.state?.from?.pathname || '/dashboard'
 
@@ -25,16 +25,31 @@ export default function Login() {
     }
   }, [isAuthenticated, from, navigate])
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault()
     setError('')
     if (!email) {
       setError('Please enter your email')
       return
     }
-    // Simple demo login/signup; accept any credentials
-    login(email, password, isSignup ? name : undefined)
-    navigate(from, { replace: true })
+    if (!password) {
+      setError('Please enter your password')
+      return
+    }
+    try {
+      if (isSignup) {
+        if (!name) {
+          setError('Please enter your name')
+          return
+        }
+        await signup(email, password, name)
+      } else {
+        await login(email, password)
+      }
+      navigate(from, { replace: true })
+    } catch (err) {
+      setError(err.message || 'Authentication failed')
+    }
   }
 
   return (

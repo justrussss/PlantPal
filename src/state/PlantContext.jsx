@@ -1,67 +1,33 @@
 import { createContext, useContext, useReducer, useEffect } from 'react'
-import { addDays, isBefore } from 'date-fns'
+import { isBefore } from 'date-fns'
 import { computeNextSchedule } from '../utils/schedule.js'
 import { useAuth } from './AuthContext'
 
 const PlantContext = createContext()
+const API_URL = 'http://localhost:5000/api'
 
 const initialState = {
   plants: [],
 }
 
-function loadState(userEmail) {
-  try {
-    if (!userEmail) return initialState
-    const key = `plantpal.plants.${userEmail}`
-    const raw = localStorage.getItem(key)
-    if (!raw) return initialState
-    const parsed = JSON.parse(raw)
-    return parsed
-  } catch {
-    return initialState
-  }
-}
-
-function saveState(state, userEmail) {
-  try {
-    if (!userEmail) return
-    const key = `plantpal.plants.${userEmail}`
-    localStorage.setItem(key, JSON.stringify(state))
-  } catch {}
-}
-
 function reducer(state, action) {
   switch (action.type) {
+    case 'SET_PLANTS': {
+      return { ...state, plants: action.payload }
+    }
     case 'ADD_PLANT': {
-      const plant = {
-        id: crypto.randomUUID(),
-        name: action.payload.name,
-        type: action.payload.type,
-        wateringIntervalDays: Number(action.payload.wateringIntervalDays || 7),
-        fertilizingIntervalDays: Number(action.payload.fertilizingIntervalDays || 30),
-        notes: action.payload.notes || '',
-        logs: [],
-      }
-      const scheduled = computeNextSchedule(plant)
-      return { ...state, plants: [...state.plants, { ...plant, ...scheduled }] }
+      return { ...state, plants: [...state.plants, action.payload] }
     }
     case 'LOG_TASK': {
-      const { id, task, date = new Date().toISOString() } = action.payload
       const plants = state.plants.map((p) => {
-        if (p.id !== id) return p
-        const logs = [{ task, date }, ...p.logs]
-        const updated = { ...p, logs }
-        const scheduled = computeNextSchedule(updated)
-        return { ...updated, ...scheduled }
+        if (p.id !== action.payload.plantId) return p
+        const updated = { ...p, logs: action.payload.logs }
+        return computeNextSchedule(updated)
       })
       return { ...state, plants }
     }
     case 'DELETE_PLANT': {
-      const { id } = action.payload
-      return { ...state, plants: state.plants.filter((p) => p.id !== id) }
-    }
-    case 'LOAD_USER_PLANTS': {
-      return action.payload
+      return { ...state, plants: state.plants.filter((p) => p.id !== action.payload) }
     }
     default:
       return state
@@ -70,18 +36,89 @@ function reducer(state, action) {
 
 export function PlantProvider({ children }) {
   const { user } = useAuth()
-  const [state, dispatch] = useReducer(reducer, undefined, () => loadState(user?.email))
+  const [state, dispatch] = useReducer(reducer, initialState)
 
+  // Load plants when user changes
   useEffect(() => {
-    saveState(state, user?.email)
-  }, [state, user?.email])
-
-  useEffect(() => {
-    if (user?.email) {
-      const newState = loadState(user?.email)
-      dispatch({ type: 'LOAD_USER_PLANTS', payload: newState })
+    if (user?.id) {
+      fetch(`${API_URL}/plants/${user.id}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            const plantsWithSchedule = data.plants.map(p => 
+              computeNextSchedule({
+                ...p,
+                wateringIntervalDays: p.watering_interval_days,
+                fertilizingIntervalDays: p.fertilizing_interval_days,
+                nextWatering: p.next_watering,
+                nextFertilizing: p.next_fertilizing,
+              })
+            )
+            dispatch({ type: 'SET_PLANTS', payload: plantsWithSchedule })
+          }
+        })
+        .catch((err) => console.error('Failed to load plants:', err))
+    } else {
+      dispatch({ type: 'SET_PLANTS', payload: [] })
     }
-  }, [user?.email])
+  }, [user?.id])
+
+  const addPlant = async (plantData) => {
+    if (!user?.id) throw new Error('No user logged in')
+    try {
+      const res = await fetch(`${API_URL}/plants`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, plant: plantData }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        const plantWithSchedule = computeNextSchedule({
+          ...data.plant,
+          wateringIntervalDays: data.plant.watering_interval_days,
+          fertilizingIntervalDays: data.plant.fertilizing_interval_days,
+        })
+        dispatch({ type: 'ADD_PLANT', payload: plantWithSchedule })
+        return plantWithSchedule
+      } else {
+        throw new Error(data.error)
+      }
+    } catch (err) {
+      throw err
+    }
+  }
+
+  const deletePlant = async (plantId) => {
+    try {
+      const res = await fetch(`${API_URL}/plants/${plantId}`, { method: 'DELETE' })
+      const data = await res.json()
+      if (data.success) {
+        dispatch({ type: 'DELETE_PLANT', payload: plantId })
+      } else {
+        throw new Error(data.error)
+      }
+    } catch (err) {
+      throw err
+    }
+  }
+
+  const logTask = async (plantId, task, date) => {
+    try {
+      const res = await fetch(`${API_URL}/plants/${plantId}/logs`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task, date }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        dispatch({ type: 'LOG_TASK', payload: { plantId, logs: data.logs } })
+      } else {
+        throw new Error(data.error)
+      }
+    } catch (err) {
+      throw err
+    }
+  }
 
   const overdueCount = state.plants.filter((p) => {
     const now = new Date()
@@ -92,7 +129,7 @@ export function PlantProvider({ children }) {
   }).length
 
   return (
-    <PlantContext.Provider value={{ state, dispatch, overdueCount }}>
+    <PlantContext.Provider value={{ state, dispatch, overdueCount, addPlant, deletePlant, logTask }}>
       {children}
     </PlantContext.Provider>
   )

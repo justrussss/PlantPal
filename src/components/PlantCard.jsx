@@ -6,13 +6,27 @@ import fertUrl from '../assets/fertilizer.svg'
 import './PlantCard.css'
 
 export default function PlantCard({ plant }) {
-  const { dispatch } = usePlants()
+  const { logTask, deletePlant } = usePlants()
   const nextWater = new Date(plant.nextWatering)
   const nextFert = new Date(plant.nextFertilizing)
   const now = new Date()
   const waterOverdue = isBefore(nextWater, now)
   const fertOverdue = isBefore(nextFert, now)
   const anyOverdue = waterOverdue || fertOverdue
+
+  const handleWater = () => {
+    logTask(plant.id, 'water', new Date().toISOString()).catch(err => console.error('Failed to log watering:', err))
+  }
+
+  const handleFertilize = () => {
+    logTask(plant.id, 'fertilize', new Date().toISOString()).catch(err => console.error('Failed to log fertilizing:', err))
+  }
+
+  const handleDelete = () => {
+    if (window.confirm(`Delete ${plant.name}? This cannot be undone.`)) {
+      deletePlant(plant.id).catch(err => console.error('Failed to delete plant:', err))
+    }
+  }
 
   return (
     <div className={`card card--elevated ${anyOverdue ? 'card--danger' : 'card--ok'}`}>
@@ -42,19 +56,15 @@ export default function PlantCard({ plant }) {
       </div>
 
       <div className="actions">
-        <button className="btn btn-info" onClick={() => dispatch({ type: 'LOG_TASK', payload: { id: plant.id, task: 'water' } })}>
+        <button className="btn btn-info" onClick={handleWater}>
           Watered Now
         </button>
-        <button className="btn btn-primary" onClick={() => dispatch({ type: 'LOG_TASK', payload: { id: plant.id, task: 'fertilize' } })}>
+        <button className="btn btn-primary" onClick={handleFertilize}>
           Fertilized Now
         </button>
         <button
           className="btn btn-warn"
-          onClick={() => {
-            if (window.confirm(`Delete ${plant.name}? This cannot be undone.`)) {
-              dispatch({ type: 'DELETE_PLANT', payload: { id: plant.id } })
-            }
-          }}
+          onClick={handleDelete}
           aria-label={`Delete ${plant.name}`}
         >
           Delete

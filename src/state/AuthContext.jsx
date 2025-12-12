@@ -1,39 +1,75 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 
 const AuthContext = createContext(null)
-
-const STORAGE_KEY = 'plantpal_user'
+const API_URL = 'http://localhost:5000/api'
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY)
-      if (raw) setUser(JSON.parse(raw))
-    } catch {}
+    const storedUser = sessionStorage.getItem('plantpal_user')
+    if (storedUser) {
+      setUser(JSON.parse(storedUser))
+    }
+    setLoading(false)
   }, [])
 
-  useEffect(() => {
-    if (user) localStorage.setItem(STORAGE_KEY, JSON.stringify(user))
-    else localStorage.removeItem(STORAGE_KEY)
-  }, [user])
-
-  const login = (email, _password, nameOverride) => {
-    const name = nameOverride || email?.split('@')[0] || 'Guest'
-    const u = { email, name }
-    setUser(u)
-    return u
+  const login = async (email, password, nameOverride) => {
+    try {
+      const res = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        const userData = { ...data.user, email }
+        setUser(userData)
+        sessionStorage.setItem('plantpal_user', JSON.stringify(userData))
+        return userData
+      } else {
+        throw new Error(data.error)
+      }
+    } catch (err) {
+      throw err
+    }
   }
 
-  const logout = () => setUser(null)
+  const signup = async (email, password, name) => {
+    try {
+      const res = await fetch(`${API_URL}/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, name }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        const userData = { ...data.user, email }
+        setUser(userData)
+        sessionStorage.setItem('plantpal_user', JSON.stringify(userData))
+        return userData
+      } else {
+        throw new Error(data.error)
+      }
+    } catch (err) {
+      throw err
+    }
+  }
+
+  const logout = () => {
+    setUser(null)
+    sessionStorage.removeItem('plantpal_user')
+  }
 
   const value = useMemo(() => ({
     user,
     isAuthenticated: !!user,
     login,
+    signup,
     logout,
-  }), [user])
+    loading,
+  }), [user, loading])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

@@ -3,14 +3,28 @@ import { usePlants } from '../state/PlantContext.jsx'
 import './PlantForm.css'
 
 export default function PlantForm() {
-  const { dispatch } = usePlants()
+  const { addPlant } = usePlants()
   const [form, setForm] = useState({ name: '', type: '', wateringIntervalDays: 7, fertilizingIntervalDays: 30, notes: '' })
+  const [error, setError] = useState('')
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault()
     if (!form.name) return
-    dispatch({ type: 'ADD_PLANT', payload: form })
-    setForm({ name: '', type: '', wateringIntervalDays: 7, fertilizingIntervalDays: 30, notes: '' })
+    setError('')
+    try {
+      await addPlant({ 
+        id: crypto.randomUUID(),
+        name: form.name, 
+        type: form.type, 
+        wateringIntervalDays: parseInt(form.wateringIntervalDays), 
+        fertilizingIntervalDays: parseInt(form.fertilizingIntervalDays), 
+        notes: form.notes,
+        logs: [],
+      })
+      setForm({ name: '', type: '', wateringIntervalDays: 7, fertilizingIntervalDays: 30, notes: '' })
+    } catch (err) {
+      setError(err.message || 'Failed to add plant')
+    }
   }
 
   return (
@@ -35,6 +49,7 @@ export default function PlantForm() {
         <label>Notes</label>
         <textarea className="textarea" rows={3} value={form.notes} onChange={(e)=>setForm({...form, notes:e.target.value})} />
       </div>
+      {error && <div className="badge badge--danger">{error}</div>}
       <div className="form-actions">
         <button className="btn btn-primary">Add Plant</button>
       </div>
