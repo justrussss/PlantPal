@@ -77,8 +77,10 @@ export function PlantProvider({ children }) {
   }, [state, user?.email])
 
   useEffect(() => {
-    const newState = loadState(user?.email)
-    dispatch({ type: 'LOAD_USER_PLANTS', payload: newState })
+    if (user?.email) {
+      const newState = loadState(user?.email)
+      dispatch({ type: 'LOAD_USER_PLANTS', payload: newState })
+    }
   }, [user?.email])
 
   const overdueCount = state.plants.filter((p) => {
